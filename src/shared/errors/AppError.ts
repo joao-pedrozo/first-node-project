@@ -1,5 +1,3 @@
-import { isThisHour } from 'date-fns';
-
 class AppError {
     public readonly message: string;
 

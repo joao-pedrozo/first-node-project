@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import { sign } from 'jsonwebtoken';
 import authConfig from '@config/auth';
 import { inject, injectable } from 'tsyringe';
