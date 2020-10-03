@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { startOfHour } from 'date-fns';
+import { startOfHour, isBefore } from 'date-fns';
 import AppError from '@shared/errors/AppError';
 import { inject, injectable } from 'tsyringe';
 
@@ -8,6 +8,7 @@ import IAppointmentsRepository from '../repositories/IAppointmentsRepository';
 
 interface IRequest {
     provider_id: string;
+    user_id: string;
     date: Date;
 }
 
@@ -21,12 +22,16 @@ class CreateAppointmentService {
     public async execute({ date, provider_id }: IRequest): Promise<Appointment> {
         const appointmentDate = startOfHour(date);
 
+        if (isBefore(appointmentDate, Date.now())) {
+            throw new AppError("You can't create an appointment on a past date.");
+        }
+
         const findAppointInSameDate = await this.appointmentsRepository.findByDate(
             appointmentDate,
         );
 
         if (findAppointInSameDate) {
-            throw new AppError('This appointment is already booked');
+            throw new AppError('This appointment is already booked.');
         }
 
         const appointment = await this.appointmentsRepository.create({
